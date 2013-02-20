@@ -12,7 +12,9 @@ raise "#{path} does not exist" unless File.exist? path
 
 config = YAML::load(File.open(path))
 
-uri = URI(config['live_transcoding_tasks_url'])
+timeout = config['timeout'].to_i
+
+uri = URI(config['tasks_url'])
 uri.port = config['media_platform_port']
 response = Net::HTTP.get_response(uri)
 
@@ -21,7 +23,7 @@ workers_config = {}
 tasks = JSON.parse response.body
 tasks.each do |task|
   workers_config['workers'] ||= []
-  workers_config['workers'] << task['command']
+  workers_config['workers'] << { id: task['id'], command: task['command'] }
 end
 
 unless workers_config.empty?
@@ -34,5 +36,23 @@ pill = File.join working_dir, 'config/workers.pill.rb'
 `rvmsudo bluepill load #{pill}`
 
 loop do
-  sleep 60
+  workers_config['workers'].each do |worker|
+    statuses = `rvmsudo bluepill status`
+    id = worker[:id]
+    status = statuses[/worker_#{id}\(pid\:\d*\)\:\s(\w*)/] ? $1 : nil
+    unless status.nil?
+      target_url = config['update_status_url'].gsub(':id', id.to_s)
+      uri = URI(target_url)
+      uri.port = config['media_platform_port']
+
+      req = Net::HTTP::Post.new(uri.path)
+      req.set_form_data(status: status)
+
+      response = Net::HTTP.start(uri.hostname, uri.port) do |http|
+        http.request(req)
+      end
+      puts response
+    end
+  end
+  sleep timeout
 end
