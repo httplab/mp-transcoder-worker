@@ -12,7 +12,7 @@ Bluepill.application('mp_live_transcoder', foreground: false, log_file: "#{worki
     id = worker[:id]
     app.process("worker_#{id}") do |process|
       process.group = 'workers'
-      process.start_command = worker['command']
+      process.start_command = 'cvlc ' + worker[:command]
 
       process.pid_file = "#{working_dir}/tmp/worker_#{id}.pid"
       process.working_dir = "#{working_dir}"
