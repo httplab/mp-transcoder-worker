@@ -45,7 +45,7 @@ loop do
       uri = URI(target_url)
       uri.port = config['media_platform_port']
 
-      req = Net::HTTP::Post.new(uri.path)
+      req = Net::HTTP::Put.new(uri.path)
       req.set_form_data(status: status)
 
       response = Net::HTTP.start(uri.hostname, uri.port) do |http|
