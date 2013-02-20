@@ -10,6 +10,7 @@ config = YAML::load File.open(File.join(working_dir, app_config['workers_config'
 Bluepill.application('mp_live_transcoder', foreground: false, log_file: "#{working_dir}/log/bluepill.log") do |app|
   config['workers'].each_with_index do |command, index|
     app.process("worker_#{index}") do |process|
+      process.group = 'workers'
       process.start_command = command
 
       process.pid_file = "#{working_dir}/tmp/worker_#{index}.pid"
