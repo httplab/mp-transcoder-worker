@@ -12,8 +12,9 @@ raise "#{path} does not exist" unless File.exist? path
 
 config = YAML::load(File.open(path))
 
-path = config['live_transcoding_tasks_path'] << '?scope=' << config['host']
-response = Net::HTTP.get_response(config['media_platform_host'], path)
+uri = URI(config['live_transcoding_tasks_url'])
+uri.port = config['media_platform_port']
+response = Net::HTTP.get_response(uri)
 
 workers_config = {}
 
@@ -32,7 +33,6 @@ end
 pill = File.join working_dir, 'config/workers.pill.rb'
 `rvmsudo bluepill load #{pill}`
 
-#loop do
-
-  #sleep 60
-#end
+loop do
+  sleep 60
+end
