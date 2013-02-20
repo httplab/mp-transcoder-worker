@@ -51,7 +51,6 @@ loop do
       response = Net::HTTP.start(uri.hostname, uri.port) do |http|
         http.request(req)
       end
-      puts response
     end
   end
   sleep timeout
