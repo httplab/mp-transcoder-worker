@@ -16,6 +16,7 @@ Bluepill.application('mp_live_transcoder', foreground: false, log_file: "#{worki
 
       process.pid_file = "#{working_dir}/tmp/worker_#{id}.pid"
       process.working_dir = "#{working_dir}"
+      process.stdout = process.stderr = "#{working_dir}/log/worker_#{id}.output"
 
       process.uid = app_config['process_user']
       process.gid = app_config['process_user']
