@@ -71,11 +71,11 @@ loop do
     id = worker[:id]
 
     if worker[:restart]
-      output = `rvmsudo bluepill restart worker_#{id}`
+      output = `rvmsudo bluepill mp_live_transcoder restart worker_#{id}`
       params[:live_transcoding_task].merge!({ restart: false }) if output.include?('Sent restart to:')
     end
 
-    statuses = `rvmsudo bluepill status`
+    statuses = `rvmsudo bluepill mp_live_transcoder status`
     status = statuses[/worker_#{id}\(pid\:\d*\)\:\s(\w*)/] ? $1 : nil
 
     params[:live_transcoding_task].merge!({ status: status }) unless status.nil?
